@@ -20,10 +20,10 @@ export default class GitiumManager {
                         && result.security.isOnboardFinished) {
                             next()
                     } else if (result.security.isTerminated) {
-                        next(new Error("This user has been terminated and cannot perform this action."))
+                        next("This user has been terminated and cannot perform this action.")
                     }
                 }).catch((error) => {
-                    next(new Error(error.reason))
+                    next(error.reason)
                 })
             })
             : next(),
