@@ -14,7 +14,11 @@ export default class GitiumManager {
         this.gitium = new Git(this.path, {
             authenticate: ({ type, user }, next) =>
             type == 'push' 
-            ? user(async ([username, password]) => {
+            ? user(async (username, password) => {
+
+                console.log(username)
+                console.log(password)
+
                 const user: User = await fetchUser(username, password)
                 console.log(user.email)
             })
