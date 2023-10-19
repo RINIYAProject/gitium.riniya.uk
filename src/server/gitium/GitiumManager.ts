@@ -13,8 +13,8 @@ export default class GitiumManager {
         this.gitium = new Git(this.path, {
             authenticate: ({ type, user }, next) =>
             type == 'push' 
-            ? user(([username, password]) => {
-                fetchUser(username, password).then((result) => {
+            ? user(async ([username, password]) => {
+                await fetchUser(username, password).then((result) => {
                     if (result.security.isEmailVerified 
                         && result.security.isMFAEnabled
                         && result.security.isOnboardFinished) {
