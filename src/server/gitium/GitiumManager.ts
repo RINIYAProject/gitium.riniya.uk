@@ -2,6 +2,7 @@ import { Git, PushData } from 'node-git-server';
 import { join } from "path";
 import ServerManager from '..';
 import { fetchUser } from '@riniya.ts/types';
+import { User } from '../database/models/User';
 
 export default class GitiumManager {
     public port: number = ServerManager.getInstance().getEnvironement().read<number>("GITIUM_SERVER_PORT") || 8090;
@@ -14,24 +15,8 @@ export default class GitiumManager {
             authenticate: ({ type, user }, next) =>
             type == 'push' 
             ? user(async ([username, password]) => {
-                await fetchUser(username, password).then((result) => {
-                    if (result.security.isEmailVerified 
-                        && result.security.isMFAEnabled
-                        && result.security.isOnboardFinished) {
-                            if (result.roleIdentifier === "admin_read_write") {
-                                next()
-                            } else {
-                                next(new Error("This user is not allowed to perform this action."))
-                                console.error("This user is not allowed to perform this action.")
-                            }
-                    } else {
-                        next(new Error("This user is not allowed to perform this action yet."))
-                        console.error("This user is not allowed to perform this action yet.")
-                    }
-                }).catch((error) => {
-                    next(new Error(error.error))
-                    console.error(error.error)
-                })
+                const user: User = await fetchUser(username, password)
+                console.log(user.email)
             })
             : next(),
             autoCreate: true
