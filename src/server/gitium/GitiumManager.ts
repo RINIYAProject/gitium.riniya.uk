@@ -18,9 +18,14 @@ export default class GitiumManager {
                     if (result.security.isEmailVerified 
                         && result.security.isMFAEnabled
                         && result.security.isOnboardFinished) {
-                            next()
+                            if (result.roleIdentifier === "admin_read_write")
+                                next()
+                            else
+                                next(new Error("This user is not allowed to perform this action."))
                     } else if (result.security.isTerminated) {
                         next(new Error("This user has been terminated and cannot perform this action."))
+                    } else {
+                        next(new Error("This user is not allowed to perform this action yet."))
                     }
                 }).catch((error) => {
                     next(new Error(error.error))
