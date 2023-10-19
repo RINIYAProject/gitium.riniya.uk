@@ -15,12 +15,17 @@ export default class GitiumManager {
             authenticate: ({ type, user }, next) =>
             type == 'push' 
             ? user(async (username, password) => {
-
-                console.log(username)
-                console.log(password)
-
                 const user: User = await fetchUser(username, password)
-                console.log(user.email)
+                if (user.security.isEmailVerified
+                    && user.security.isMFAEnabled
+                    && user.security.isOnboardFinished
+                    && user.roleIdentifier === "admin_read_write") {
+                        next()
+                } else if (user.security.isTerminated) {
+                    next(new Error("This user has been terminated due to TOS violation."))
+                } else {
+                    next(new Error("This user does not meet all the requirements to perform this action."))
+                }
             })
             : next(),
             autoCreate: true
